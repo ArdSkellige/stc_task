@@ -90,6 +90,21 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 		frameAdjustLayoutP->addLayout(hblayP);
 	}
 	{// layout 4:
+		auto* hblayP = new QHBoxLayout(this);
+		lblFindEmplP = createQLabel("Employee ID:");
+		ledFindEmplP = createQLineEdit();
+		btbFindEmplP = createPushButton("Find ID");
+		lblQuantityEmplP = createQLabel("Quantity Empls:");
+		lblQuantityEmplModeP = createQLabel("0");
+
+		hblayP->addWidget(lblFindEmplP);
+		hblayP->addWidget(ledFindEmplP);
+		hblayP->addWidget(btbFindEmplP);
+		hblayP->addWidget(lblQuantityEmplP);
+		hblayP->addWidget(lblQuantityEmplModeP);
+		frameAdjustLayoutP->addLayout(hblayP);
+	}
+	{// layout 5:
 		auto* vblayP = new QVBoxLayout(this);
 		grbxBtnPnlP = new QGroupBox("File");
 		btnWriteFileP = createPushButton("Write");
@@ -103,7 +118,9 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 	vblayMainP->addStretch();
 
 	connect(btnAddEmployeeP, &QPushButton::clicked, this, &MainWgt_t::slotAddEmployee);
-	// connect(cmbboxFileMaskP, &QComboBox::activated, myLineEditP, &MyLineEdit::slotFileMode);
+	connect(btbFindEmplP, &QPushButton::clicked, this, &MainWgt_t::slotFindEmployee);
+	connect(ledFindEmplP, &QLineEdit::textChanged, this, &MainWgt_t::slotCheckID);
+	connect(btnWriteFileP, &QPushButton::clicked, this, &MainWgt_t::slotWritefile);
 }
 
 MainWgt_t::~MainWgt_t()
@@ -155,4 +172,54 @@ void MainWgt_t::slotAddEmployee()
 {
 	Employee_t tmpEmp;
 	tmpEmp.SetName(ledNameP->text().toStdString().c_str());
+	tmpEmp.SetSurname(ledSurnameP->text().toStdString().c_str());
+	tmpEmp.SetMiddlename(ledMiddleNameP->text().toStdString().c_str());
+	tmpEmp.SetSex(cmbboxSexP->currentIndex());
+	tmpEmp.SetAge(spnbAgeP->value());
+	tmpEmp.SetExperience(spnbExperienceP->value());
+	tmpEmp.SetPhoneNumber(ledPhoneNumberP->text().toStdString().c_str());
+
+	vecEmpl.push_back(tmpEmp);
+	lblQuantityEmplModeP->setText(QString::number(vecEmpl.size()));
+}
+
+void MainWgt_t::slotFindEmployee()
+{
+	QVariant variant(ledFindEmplP->text());
+	int num = variant.toInt();
+
+	ledNameP->setText(vecEmpl[num].GetName());
+	ledSurnameP->setText(vecEmpl[num].GetSername());
+	ledMiddleNameP->setText(vecEmpl[num].GetMiddlename());
+	cmbboxSexP->setCurrentIndex(vecEmpl[num].GetSex());
+	spnbAgeP->setValue(vecEmpl[num].GetAge());
+	spnbExperienceP->setValue(vecEmpl[num].GetExperience());
+	ledPhoneNumberP->setText(vecEmpl[num].GetPhoneNumber());
+}
+
+void MainWgt_t::slotCheckID(QString id)
+{
+	QVariant variant(id);
+    int num = variant.toInt();
+    if(num >= 255)
+    {
+		num = 255;
+        ledFindEmplP->setText(QString::number(num));
+    }
+}
+
+void MainWgt_t::slotWritefile()
+{
+	QFile file("employee list.txt");
+	if(file.open(QIODevice::ReadWrite))
+	{
+		QTextStream txtstr(&file);
+		for(size_t i = 0; i < vecEmpl.size(); i++)
+		{
+			txtstr << "ID: " << i << ", Name: " << vecEmpl[i].GetName() << ", Surame: " << vecEmpl[i].GetSername() << ", Middlename: " << vecEmpl[i].GetMiddlename() << ",\n";
+			txtstr << " Age = " << vecEmpl[i].GetAge() << ", Sex = " << vecEmpl[i].GetSex();
+			txtstr << ", Experience = " << vecEmpl[i].GetExperience() << ", PhoneNumber " << vecEmpl[i].GetPhoneNumber() << ";\n";
+		}
+	}
+	file.close();
 }

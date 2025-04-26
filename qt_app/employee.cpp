@@ -5,11 +5,28 @@
 Employee_t::Employee_t(const char* _name, const char* _surname, const char* _middlename, size_t _age, SEX _sex, int _experience, const char* _phoneNum) 
 	: Person_t(_name, _surname, _middlename, _age, _sex), experience(_experience)
 {
-	phoneNum = new char[strlen(_phoneNum) + 1];
-	strcpy(phoneNum, _phoneNum);
+	phoneNumP = new char[strlen(_phoneNum) + 1];
+	strcpy(phoneNumP, _phoneNum);
+}
+
+Employee_t::Employee_t(const Employee_t& other) : Person_t(other)
+{
+	phoneNumP = new char[strlen(other.phoneNumP) + 1];
+	strcpy(phoneNumP, other.phoneNumP);
+	experience = other.experience;
 }
 
 Employee_t::~Employee_t()
 {
-	delete[] phoneNum;
+	delete[] phoneNumP;
+}
+
+void Employee_t::SetPhoneNumber(const char* num)
+{
+	if(num)
+	{
+		delete[] phoneNumP;
+		phoneNumP = new char[strlen(num) + 1];
+		strcpy(phoneNumP, num);
+	}
 }

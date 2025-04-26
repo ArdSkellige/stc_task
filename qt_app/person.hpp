@@ -14,7 +14,8 @@ private:
 	size_t age;
 	SEX sex;
 public:
-	Person_t(const char* _name = "", const char* _surname = "", const char* _middlename = "", size_t _age = 18, SEX _sex = MAN);
+	Person_t(const char* _name = "Undef", const char* _surname = "Undef", const char* _middlename = "Undef", size_t _age = 18, SEX _sex = MAN);
+	Person_t(const Person_t& other);
 	virtual ~Person_t();
 
 	void SetName(const char* _name);

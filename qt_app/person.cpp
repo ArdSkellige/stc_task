@@ -14,6 +14,21 @@ Person_t::Person_t(const char* _name, const char* _surname, const char* _middlen
 	strcpy(middlename, _middlename);
 }
 
+Person_t::Person_t(const Person_t& other)
+{
+	name = new char[strlen(other.name) + 1];
+	strcpy(name, other.name);
+
+	surname = new char[strlen(other.surname) + 1];
+	strcpy(surname, other.surname);
+
+	middlename = new char[strlen(other.middlename) + 1];
+	strcpy(middlename, other.middlename);
+
+	age = other.age;
+	sex = other.sex;
+}
+
 Person_t::~Person_t()
 {
 	delete[] name;

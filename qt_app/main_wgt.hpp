@@ -2,6 +2,7 @@
 #define MAINWGT_H
 
 #include <QComboBox>
+#include <QFile>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -45,6 +46,12 @@ protected:
 	QLabel* lblPhoneNumberP;
 	QLineEdit* ledPhoneNumberP;
 // layout 4:
+	QLabel* lblFindEmplP;
+	QLineEdit* ledFindEmplP;
+	QPushButton* btbFindEmplP;
+	QLabel* lblQuantityEmplP;
+	QLabel* lblQuantityEmplModeP;
+// layout 5:
 	QGroupBox *grbxBtnPnlP;
 	QPushButton* btnWriteFileP;
 	QPushButton* btnCheckFileP;
@@ -61,5 +68,8 @@ public:
 
 public slots:
 	void slotAddEmployee();
+	void slotFindEmployee();
+	void slotCheckID(QString id);
+	void slotWritefile();
 };
 #endif // MAINWGT_H
