@@ -30,3 +30,18 @@ void Employee_t::SetPhoneNumber(const char* num)
 		strcpy(phoneNumP, num);
 	}
 }
+
+Employee_t& Employee_t::operator=(const Employee_t& other)
+{
+	if (this != &other)
+	{
+		Person_t::operator=(other);
+
+		delete[] phoneNumP;
+		phoneNumP = new char[strlen(other.phoneNumP) + 1];
+		strcpy(phoneNumP, other.phoneNumP);
+
+		experience = other.experience;
+	}
+	return *this;
+}

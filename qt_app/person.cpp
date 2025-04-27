@@ -78,3 +78,25 @@ void Person_t::SetSex(int _sex)
 {
 	sex = static_cast<SEX>(_sex);
 }
+
+Person_t& Person_t::operator=(const Person_t& other)
+{
+	if (this != &other)
+	{
+		delete[] name;
+		name = new char[strlen(other.name) + 1];
+		strcpy(name, other.name);
+
+		delete[] surname;
+		surname = new char[strlen(other.surname) + 1];
+		strcpy(surname, other.surname);
+
+		delete[] middlename;
+		middlename = new char[strlen(other.middlename) + 1];
+		strcpy(middlename, other.middlename);
+
+		age = other.age;
+		sex = other.sex;
+	}
+	return *this;
+}

@@ -28,6 +28,8 @@ public:
 	size_t GetAge() const { return age; }
 	void SetSex(int _sex);
 	SEX GetSex() const { return sex; }
+
+	Person_t& operator=(const Person_t& other);
 };
 
 #endif // PERSON_H

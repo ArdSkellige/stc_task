@@ -17,6 +17,8 @@ public:
 	const char* GetPhoneNumber() const { return phoneNumP; }
 	void SetExperience(int exper) { if(exper >= 0){ experience = exper; } }
 	int GetExperience() const { return experience; }
+
+	Employee_t& operator=(const Employee_t& other);
 };
 
 #endif // EMPLOYEE_H

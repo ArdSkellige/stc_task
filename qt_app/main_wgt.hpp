@@ -21,7 +21,6 @@ private:
 	std::vector<Employee_t> vecEmpl;
 protected:
 // Frame for Adjust:
-	QPushButton *btnAddEmployeeP;
 	QLabel *labelAdjustP;
 	QFrame *frameAdjustP;
 	QVBoxLayout *frameAdjustLayoutP;
@@ -49,9 +48,12 @@ protected:
 	QLabel* lblFindEmplP;
 	QLineEdit* ledFindEmplP;
 	QPushButton* btbFindEmplP;
+// layout 5:
+	QPushButton *btnAddEmployeeP;
+	QPushButton *btnDeleteEmployeeP;
 	QLabel* lblQuantityEmplP;
 	QLabel* lblQuantityEmplModeP;
-// layout 5:
+// layout 6:
 	QGroupBox *grbxBtnPnlP;
 	QPushButton* btnWriteFileP;
 	QPushButton* btnCheckFileP;
@@ -68,6 +70,7 @@ public:
 
 public slots:
 	void slotAddEmployee();
+	void slotDeleteEmployee();
 	void slotFindEmployee();
 	void slotCheckID(QString id);
 	void slotWritefile();

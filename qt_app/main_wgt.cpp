@@ -20,11 +20,8 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 				labelAdjustP->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 				// labelAdjustP->setFrameStyle(QFrame::Sunken | QFrame::Box);
 				labelAdjustP->setAlignment(Qt::AlignLeft);
-				btnAddEmployeeP = createPushButton(" Add Employee ");
-				btnAddEmployeeP->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
 				hblayP->addWidget(labelAdjustP, Qt::AlignLeft);
-				hblayP->addWidget(btnAddEmployeeP, Qt::AlignRight);
 				frameAdjustLayoutP->addLayout(hblayP);
 			}
 			vblayMainP->addWidget(frameAdjustP);
@@ -94,17 +91,29 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 		lblFindEmplP = createQLabel("Employee ID:");
 		ledFindEmplP = createQLineEdit();
 		btbFindEmplP = createPushButton("Find ID");
-		lblQuantityEmplP = createQLabel("Quantity Empls:");
-		lblQuantityEmplModeP = createQLabel("0");
 
 		hblayP->addWidget(lblFindEmplP);
 		hblayP->addWidget(ledFindEmplP);
 		hblayP->addWidget(btbFindEmplP);
-		hblayP->addWidget(lblQuantityEmplP);
-		hblayP->addWidget(lblQuantityEmplModeP);
 		frameAdjustLayoutP->addLayout(hblayP);
 	}
 	{// layout 5:
+		auto* hblayP = new QHBoxLayout(this);
+		btnAddEmployeeP = createPushButton(" Add Employee ");
+		btnAddEmployeeP->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+		btnDeleteEmployeeP = createPushButton(" Delete Employee ");
+		btnDeleteEmployeeP->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+		lblQuantityEmplP = createQLabel("Quantity Empls:");
+		lblQuantityEmplModeP = createQLabel("0");
+
+		hblayP->addWidget(btnAddEmployeeP);
+		hblayP->addWidget(btnDeleteEmployeeP);
+		hblayP->addWidget(lblQuantityEmplP);
+		hblayP->addWidget(lblQuantityEmplModeP);
+		hblayP->setAlignment(Qt::AlignLeft);
+		frameAdjustLayoutP->addLayout(hblayP);
+	}
+	{// layout 6:
 		auto* vblayP = new QVBoxLayout(this);
 		grbxBtnPnlP = new QGroupBox("File");
 		btnWriteFileP = createPushButton("Write");
@@ -118,6 +127,7 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 	vblayMainP->addStretch();
 
 	connect(btnAddEmployeeP, &QPushButton::clicked, this, &MainWgt_t::slotAddEmployee);
+	connect(btnDeleteEmployeeP, &QPushButton::clicked, this, &MainWgt_t::slotDeleteEmployee);
 	connect(btbFindEmplP, &QPushButton::clicked, this, &MainWgt_t::slotFindEmployee);
 	connect(ledFindEmplP, &QLineEdit::textChanged, this, &MainWgt_t::slotCheckID);
 	connect(btnWriteFileP, &QPushButton::clicked, this, &MainWgt_t::slotWritefile);
@@ -183,11 +193,29 @@ void MainWgt_t::slotAddEmployee()
 	lblQuantityEmplModeP->setText(QString::number(vecEmpl.size()));
 }
 
+void MainWgt_t::slotDeleteEmployee()
+{
+	QVariant variant(ledFindEmplP->text());
+	int num = variant.toInt();
+	if(num < vecEmpl.size())
+	{
+		auto itbeg = vecEmpl.begin();
+		itbeg += num;
+		vecEmpl.erase(itbeg);
+
+		lblQuantityEmplModeP->setText(QString::number(vecEmpl.size()));
+	}
+}
+
 void MainWgt_t::slotFindEmployee()
 {
 	QVariant variant(ledFindEmplP->text());
 	int num = variant.toInt();
-
+	if(num >= vecEmpl.size())
+	{
+		num = vecEmpl.size() - 1;
+	}
+	
 	ledNameP->setText(vecEmpl[num].GetName());
 	ledSurnameP->setText(vecEmpl[num].GetSername());
 	ledMiddleNameP->setText(vecEmpl[num].GetMiddlename());
@@ -213,6 +241,7 @@ void MainWgt_t::slotWritefile()
 	QFile file("employee list.txt");
 	if(file.open(QIODevice::ReadWrite))
 	{
+		file.resize(0);
 		QTextStream txtstr(&file);
 		for(size_t i = 0; i < vecEmpl.size(); i++)
 		{
