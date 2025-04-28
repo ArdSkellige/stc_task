@@ -117,12 +117,30 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 		auto* vblayP = new QVBoxLayout(this);
 		grbxBtnPnlP = new QGroupBox("File");
 		btnWriteFileP = createPushButton("Write");
+		btnWriteAndModifyFileP = createPushButton("Write and Modify");
 		btnCheckFileP = createPushButton("Check");
 
 		vblayP->addWidget(btnWriteFileP);
+		vblayP->addWidget(btnWriteAndModifyFileP);
 		vblayP->addWidget(btnCheckFileP);
 		grbxBtnPnlP->setLayout(vblayP);
 		vblayMainP->addWidget(grbxBtnPnlP);
+
+		{// layout 6.1:
+			auto* hblayP = new QHBoxLayout(this);
+			lblCrcP = createQLabel("Current crc");
+			lblCrcModeP = createQLabel(" - ");
+			lblCrcModeP->setFixedWidth(35);
+			lblCrcModeP->setFrameStyle(QFrame::Sunken | QFrame::Box);
+			lblInputRangeP = createQLabel("Input number (0...255):");
+			ledInputRangeP = createQLineEdit();
+
+			hblayP->addWidget(lblCrcP);
+			hblayP->addWidget(lblCrcModeP);
+			hblayP->addWidget(lblInputRangeP);
+			hblayP->addWidget(ledInputRangeP);
+			vblayP->addLayout(hblayP);
+		}
 	}
 	vblayMainP->addStretch();
 
@@ -130,7 +148,9 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 	connect(btnDeleteEmployeeP, &QPushButton::clicked, this, &MainWgt_t::slotDeleteEmployee);
 	connect(btbFindEmplP, &QPushButton::clicked, this, &MainWgt_t::slotFindEmployee);
 	connect(ledFindEmplP, &QLineEdit::textChanged, this, &MainWgt_t::slotCheckID);
+	connect(ledInputRangeP, &QLineEdit::textChanged, this, &MainWgt_t::slotCheckRange);
 	connect(btnWriteFileP, &QPushButton::clicked, this, &MainWgt_t::slotWritefile);
+	connect(btnWriteAndModifyFileP, &QPushButton::clicked, this, &MainWgt_t::slotWriteModifyFile);
 }
 
 MainWgt_t::~MainWgt_t()
@@ -228,12 +248,30 @@ void MainWgt_t::slotFindEmployee()
 void MainWgt_t::slotCheckID(QString id)
 {
 	QVariant variant(id);
-    int num = variant.toInt();
-    if(num >= 255)
-    {
+	int num = variant.toInt();
+	if(num >= vecEmpl.size())
+	{
+		if(vecEmpl.size())
+		{
+			num = vecEmpl.size() - 1;
+		}
+		else if(vecEmpl.size() == 0)
+		{
+			num = 0;
+		}
+		ledFindEmplP->setText(QString::number(num));
+	}
+}
+
+void MainWgt_t::slotCheckRange(QString id)
+{
+	QVariant variant(id);
+	int num = variant.toInt();
+	if(num > 255)
+	{
 		num = 255;
-        ledFindEmplP->setText(QString::number(num));
-    }
+		ledInputRangeP->setText(QString::number(num));
+	}
 }
 
 void MainWgt_t::slotWritefile()
@@ -251,4 +289,48 @@ void MainWgt_t::slotWritefile()
 		}
 	}
 	file.close();
+}
+
+void MainWgt_t::slotWriteModifyFile()
+{
+	QByteArray bAr;
+	for(size_t i = 0; i < vecEmpl.size(); i++)
+	{
+		bAr.append(vecEmpl[i].GetName()).append(" ");
+		bAr.append(vecEmpl[i].GetSername()).append(" ");
+		bAr.append(vecEmpl[i].GetMiddlename()).append(" ");
+		bAr.append(QString::number(vecEmpl[i].GetAge()).toStdString().c_str()).append(" ");
+		bAr.append(QString::number(vecEmpl[i].GetSex()).toStdString().c_str()).append(" ");
+		bAr.append(QString::number(vecEmpl[i].GetExperience()).toStdString().c_str()).append(" ");
+		bAr.append(vecEmpl[i].GetPhoneNumber()).append("\n");
+	}
+
+	QVariant variant(ledInputRangeP->text());
+	uint8_t mask = variant.toInt();
+	for(size_t i = 0; i < bAr.size(); i++)
+	{
+		bAr[i] = bAr[i] ^ mask;
+	}
+
+	QFile file(QFileDialog::getSaveFileName(this, "Name file", "byteArray_list", "*.txt;; *.bin"));
+	if(file.open(QIODevice::ReadWrite))
+	{
+		file.resize(0);
+		file.write(bAr);
+	}
+
+	// QString fileCrcName = file.fileName();
+	// for(size_t i = 0; i < 3; i++)
+	// {
+	// 	fileCrcName.removeLast();
+	// }
+	// QFile fileCrc(fileCrcName + "crc");
+	// if(fileCrc.open(QIODevice::ReadWrite))
+	// {
+	// 	fileCrc.resize(0);
+	// 	fileCrc.write("114");
+	// }
+
+	file.close();
+	// fileCrc.close();
 }

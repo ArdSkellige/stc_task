@@ -3,6 +3,7 @@
 
 #include <QComboBox>
 #include <QFile>
+#include <QFileDialog>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -56,7 +57,13 @@ protected:
 // layout 6:
 	QGroupBox *grbxBtnPnlP;
 	QPushButton* btnWriteFileP;
+	QPushButton* btnWriteAndModifyFileP;
 	QPushButton* btnCheckFileP;
+	// layout 6.1:
+	QLabel* lblCrcP;
+	QLabel* lblCrcModeP;
+	QLabel* lblInputRangeP;
+	QLineEdit* ledInputRangeP;
 
 public:
 	MainWgt_t(QWidget* parent = nullptr);
@@ -73,6 +80,8 @@ public slots:
 	void slotDeleteEmployee();
 	void slotFindEmployee();
 	void slotCheckID(QString id);
+	void slotCheckRange(QString id);
 	void slotWritefile();
+	void slotWriteModifyFile();
 };
 #endif // MAINWGT_H
