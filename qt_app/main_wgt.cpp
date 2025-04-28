@@ -151,6 +151,7 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 	connect(ledInputRangeP, &QLineEdit::textChanged, this, &MainWgt_t::slotCheckRange);
 	connect(btnWriteFileP, &QPushButton::clicked, this, &MainWgt_t::slotWritefile);
 	connect(btnWriteAndModifyFileP, &QPushButton::clicked, this, &MainWgt_t::slotWriteModifyFile);
+	connect(btnCheckFileP, &QPushButton::clicked, this, &MainWgt_t::slotCheckFile);
 }
 
 MainWgt_t::~MainWgt_t()
@@ -333,4 +334,23 @@ void MainWgt_t::slotWriteModifyFile()
 
 	file.close();
 	// fileCrc.close();
+}
+
+void MainWgt_t::slotCheckFile()
+{
+	QFile file(QFileDialog::getOpenFileName(this, "Select file", "", "*.txt;; *.bin"));
+	if(file.open(QIODevice::ReadWrite))
+	{
+		QByteArray bAr = file.readAll();
+		QVariant variant(ledInputRangeP->text());
+		uint8_t mask = variant.toInt();
+		for(size_t i = 0; i < bAr.size(); i++)
+		{
+			bAr[i] = bAr[i] ^ mask;
+		}
+
+		file.resize(0);
+		file.write(bAr);
+	}
+	file.close();
 }

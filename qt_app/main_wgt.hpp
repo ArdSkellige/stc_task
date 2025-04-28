@@ -83,5 +83,6 @@ public slots:
 	void slotCheckRange(QString id);
 	void slotWritefile();
 	void slotWriteModifyFile();
+	void slotCheckFile();
 };
 #endif // MAINWGT_H
