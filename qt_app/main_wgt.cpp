@@ -130,7 +130,7 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 			auto* hblayP = new QHBoxLayout(this);
 			lblCrcP = createQLabel("Current crc");
 			lblCrcModeP = createQLabel(" - ");
-			lblCrcModeP->setFixedWidth(35);
+			lblCrcModeP->setMinimumWidth(75);
 			lblCrcModeP->setFrameStyle(QFrame::Sunken | QFrame::Box);
 			lblInputRangeP = createQLabel("Input number (0...255):");
 			ledInputRangeP = createQLineEdit();
@@ -295,7 +295,7 @@ void MainWgt_t::slotWritefile()
 void MainWgt_t::slotWriteModifyFile()
 {
 	QByteArray bAr;
-	for(size_t i = 0; i < vecEmpl.size(); i++)
+	for(size_t i = 0; i < vecEmpl.size(); i++) // reading all datas
 	{
 		bAr.append(vecEmpl[i].GetName()).append(" ");
 		bAr.append(vecEmpl[i].GetSername()).append(" ");
@@ -308,32 +308,35 @@ void MainWgt_t::slotWriteModifyFile()
 
 	QVariant variant(ledInputRangeP->text());
 	uint8_t mask = variant.toInt();
-	for(size_t i = 0; i < bAr.size(); i++)
+	for(size_t i = 0; i < bAr.size(); i++) // XOR for each byte from byteAr
 	{
 		bAr[i] = bAr[i] ^ mask;
 	}
 
-	QFile file(QFileDialog::getSaveFileName(this, "Name file", "byteArray_list", "*.txt;; *.bin"));
+	QFile file(QFileDialog::getSaveFileName(this, "Name file", "byteArray_list", "*.txt;; *.bin")); // save changed byteAr in file
 	if(file.open(QIODevice::ReadWrite))
 	{
 		file.resize(0);
 		file.write(bAr);
 	}
 
-	// QString fileCrcName = file.fileName();
-	// for(size_t i = 0; i < 3; i++)
-	// {
-	// 	fileCrcName.removeLast();
-	// }
-	// QFile fileCrc(fileCrcName + "crc");
-	// if(fileCrc.open(QIODevice::ReadWrite))
-	// {
-	// 	fileCrc.resize(0);
-	// 	fileCrc.write("114");
-	// }
+	uint32_t crc = Crc::Count(bAr.constData(), bAr.size()); // count crc32
+	lblCrcModeP->setText(QString::number(crc, 16));
+
+	QString fileCrcName = file.fileName();
+	for(size_t i = 0; i < 3; i++)
+	{
+		fileCrcName.removeLast();
+	}
+	QFile fileCrc(fileCrcName + "crc");
+	if(fileCrc.open(QIODevice::ReadWrite))
+	{
+		fileCrc.resize(0);
+		fileCrc.write(QString::number(crc).toStdString().c_str());
+	}
 
 	file.close();
-	// fileCrc.close();
+	fileCrc.close();
 }
 
 void MainWgt_t::slotCheckFile()

@@ -13,6 +13,7 @@
 #include <QWidget>
 #include <vector>
 
+#include "crc_32.hpp"
 #include "employee.hpp"
 
 class MainWgt_t : public QWidget
