@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <vector>
@@ -21,6 +22,7 @@ class MainWgt_t : public QWidget
 	Q_OBJECT
 private:
 	std::vector<Employee_t> vecEmpl;
+	QTimer *timerBtnCheckP = new QTimer(this);
 protected:
 // Frame for Adjust:
 	QLabel *labelAdjustP;
@@ -85,5 +87,6 @@ public slots:
 	void slotWritefile();
 	void slotWriteModifyFile();
 	void slotCheckFile();
+	void slotColorBtn();
 };
 #endif // MAINWGT_H

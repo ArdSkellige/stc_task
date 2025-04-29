@@ -152,6 +152,9 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 	connect(btnWriteFileP, &QPushButton::clicked, this, &MainWgt_t::slotWritefile);
 	connect(btnWriteAndModifyFileP, &QPushButton::clicked, this, &MainWgt_t::slotWriteModifyFile);
 	connect(btnCheckFileP, &QPushButton::clicked, this, &MainWgt_t::slotCheckFile);
+
+	timerBtnCheckP->setInterval(2000);
+	connect(timerBtnCheckP, &QTimer::timeout, this, &MainWgt_t::slotColorBtn);
 }
 
 MainWgt_t::~MainWgt_t()
@@ -369,10 +372,25 @@ void MainWgt_t::slotCheckFile()
 			{
 				bAr[i] = bAr[i] ^ mask;
 			}
+			btnCheckFileP->setStyleSheet("background-color: YellowGreen");
+			btnCheckFileP->setText("Check successful");
 		}
+		else
+		{
+			btnCheckFileP->setStyleSheet("background-color: Crimson");
+			btnCheckFileP->setText("Check failed");
+		}
+		timerBtnCheckP->start();
 
 		file.resize(0);
 		file.write(bAr);
 	}
 	file.close();
+}
+
+void MainWgt_t::slotColorBtn()
+{
+	btnCheckFileP->setText("Check");
+	btnCheckFileP->setStyleSheet("background-color: Gainsboro");
+	timerBtnCheckP->stop();
 }
