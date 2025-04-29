@@ -130,7 +130,7 @@ MainWgt_t::MainWgt_t(QWidget* parent) : QWidget(parent)
 			auto* hblayP = new QHBoxLayout(this);
 			lblCrcP = createQLabel("Current crc");
 			lblCrcModeP = createQLabel(" - ");
-			lblCrcModeP->setMinimumWidth(75);
+			lblCrcModeP->setMinimumWidth(85);
 			lblCrcModeP->setFrameStyle(QFrame::Sunken | QFrame::Box);
 			lblInputRangeP = createQLabel("Input number (0...255):");
 			ledInputRangeP = createQLineEdit();
@@ -307,7 +307,7 @@ void MainWgt_t::slotWriteModifyFile()
 	}
 
 	QVariant variant(ledInputRangeP->text());
-	uint8_t mask = variant.toInt();
+	uint8_t mask = variant.toUInt();
 	for(size_t i = 0; i < bAr.size(); i++) // XOR for each byte from byteAr
 	{
 		bAr[i] = bAr[i] ^ mask;
@@ -320,8 +320,8 @@ void MainWgt_t::slotWriteModifyFile()
 		file.write(bAr);
 	}
 
-	uint32_t crc = Crc::Count(bAr.constData(), bAr.size()); // count crc32
-	lblCrcModeP->setText(QString::number(crc, 16));
+	uint32_t currentCrc = Crc::Count(bAr.constData(), bAr.size()); // count crc32 of current empls list
+	lblCrcModeP->setText("0x" + QString::number(currentCrc, 16));
 
 	QString fileCrcName = file.fileName();
 	for(size_t i = 0; i < 3; i++)
@@ -332,7 +332,7 @@ void MainWgt_t::slotWriteModifyFile()
 	if(fileCrc.open(QIODevice::ReadWrite))
 	{
 		fileCrc.resize(0);
-		fileCrc.write(QString::number(crc).toStdString().c_str());
+		fileCrc.write(QString::number(currentCrc).toStdString().c_str());
 	}
 
 	file.close();
@@ -341,15 +341,34 @@ void MainWgt_t::slotWriteModifyFile()
 
 void MainWgt_t::slotCheckFile()
 {
-	QFile file(QFileDialog::getOpenFileName(this, "Select file", "", "*.txt;; *.bin"));
+	QFile file(QFileDialog::getOpenFileName(this, "Select file", "", "*.txt;; *.bin")); // choose file with byteAr
+
+	uint32_t crcKeepInFile = 0; // *.crc
+	uint32_t crcFile = 0; // *.txt or *.bin
+	QString fileCrcName = file.fileName();
+	for(size_t i = 0; i < 3; i++)
+	{
+		fileCrcName.removeLast();
+	}
+	QFile fileCrc(fileCrcName + "crc"); // check crc in choosen file and current crc
+	if(fileCrc.open(QIODevice::ReadWrite))
+	{
+		crcKeepInFile = fileCrc.readAll().toUInt();
+	}
+
 	if(file.open(QIODevice::ReadWrite))
 	{
 		QByteArray bAr = file.readAll();
-		QVariant variant(ledInputRangeP->text());
-		uint8_t mask = variant.toInt();
-		for(size_t i = 0; i < bAr.size(); i++)
+		crcFile = Crc::Count(bAr.constData(), bAr.size()); // count crc32 from .txt/.bin file
+
+		if(crcKeepInFile == crcFile)
 		{
-			bAr[i] = bAr[i] ^ mask;
+			QVariant variant(ledInputRangeP->text());
+			uint8_t mask = variant.toInt();
+			for(size_t i = 0; i < bAr.size(); i++) // convert back changed byteAr via XOR
+			{
+				bAr[i] = bAr[i] ^ mask;
+			}
 		}
 
 		file.resize(0);
