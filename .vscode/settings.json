@@ -33,6 +33,9 @@
     "new": "cpp",
     "qlabel": "cpp",
     "qpushbutton": "cpp",
-    "vector": "cpp"
+    "vector": "cpp",
+    "filesystem": "cpp",
+    "xstring": "cpp",
+    "string": "cpp"
   }
 }

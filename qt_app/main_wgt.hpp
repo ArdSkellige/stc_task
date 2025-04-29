@@ -78,6 +78,8 @@ public:
 	QPushButton* createPushButton(const char* str = "");
 	QLineEdit* createQLineEdit();
 
+	void FillEmployeeListFromFile(const QByteArray& bytar, size_t size);
+
 public slots:
 	void slotAddEmployee();
 	void slotDeleteEmployee();

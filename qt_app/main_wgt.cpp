@@ -202,6 +202,121 @@ QLineEdit* MainWgt_t::createQLineEdit()
 	return tmpLEd;
 }
 
+void MainWgt_t::FillEmployeeListFromFile(const QByteArray& bytar, size_t size)
+{
+	if(size)
+	{
+		size_t i = 0;
+		while(i != (size - 1))
+		{
+			while(bytar[i] != '\n') // reading byteAr for one empl
+			{
+				Employee_t tmpEmp;
+				if(bytar[i] != ' ') // name
+				{
+					QString nameTmp;
+					while(bytar[i] != ' ')
+					{
+						nameTmp.append(bytar[i]);
+						i++;
+					}
+					tmpEmp.SetName(nameTmp.toStdString().c_str());
+					i++;
+				}
+				else
+				{
+					tmpEmp.SetName(""); // name is empty
+					i++;
+				}
+
+				if(bytar[i] != ' ') // surname
+				{
+					QString surnameTmp;
+					while(bytar[i] != ' ')
+					{
+						surnameTmp.append(bytar[i]);
+						i++;
+					}
+					tmpEmp.SetSurname(surnameTmp.toStdString().c_str());
+					i++;
+				}
+				else
+				{
+					tmpEmp.SetSurname(""); // surname is empty
+					i++;
+				}
+
+				if(bytar[i] != ' ') // middlename
+				{
+					QString middlenameTmp;
+					while(bytar[i] != ' ')
+					{
+						middlenameTmp.append(bytar[i]);
+						i++;
+					}
+					tmpEmp.SetMiddlename(middlenameTmp.toStdString().c_str());
+					i++;
+				}
+				else
+				{
+					tmpEmp.SetMiddlename(""); // middlename is empty
+					i++;
+				}
+				
+				{
+					QString age;
+					while(bytar[i] != ' ') // age
+					{
+						age.append(bytar[i]);
+						i++;
+					}
+					tmpEmp.SetAge(age.toInt());
+					i++;
+				}
+
+				{
+					tmpEmp.SetSex(bytar[i]); // sex
+					i+=2;
+				}
+
+				{
+					QString experience;
+					while(bytar[i] != ' ') // experience
+					{
+						experience.append(bytar[i]);
+						i++;
+					}
+					tmpEmp.SetExperience(experience.toInt());
+					i++;
+				}
+
+				if(bytar[i] != '\n') // phone number
+				{
+					QString phoneNumber;
+					while(bytar[i] != '\n')
+					{
+						phoneNumber.append(bytar[i]);
+						i++;
+					}
+					tmpEmp.SetPhoneNumber(phoneNumber.toStdString().c_str());
+					if(i != (size-1))
+					{
+						i++;
+					}
+				}
+				else
+				{
+					tmpEmp.SetPhoneNumber(""); // middlename is empty
+					i++;
+				}
+
+				vecEmpl.push_back(tmpEmp);
+			}
+		}
+		lblQuantityEmplModeP->setText(QString::number(vecEmpl.size()));
+	}
+}
+
 void MainWgt_t::slotAddEmployee()
 {
 	Employee_t tmpEmp;
@@ -353,7 +468,7 @@ void MainWgt_t::slotCheckFile()
 	{
 		fileCrcName.removeLast();
 	}
-	QFile fileCrc(fileCrcName + "crc"); // check crc in choosen file and current crc
+	QFile fileCrc(fileCrcName + "crc"); // check crc in choosen *.crc file
 	if(fileCrc.open(QIODevice::ReadWrite))
 	{
 		crcKeepInFile = fileCrc.readAll().toUInt();
@@ -372,6 +487,8 @@ void MainWgt_t::slotCheckFile()
 			{
 				bAr[i] = bAr[i] ^ mask;
 			}
+			FillEmployeeListFromFile(bAr, bAr.size());
+
 			btnCheckFileP->setStyleSheet("background-color: YellowGreen");
 			btnCheckFileP->setText("Check successful");
 		}
